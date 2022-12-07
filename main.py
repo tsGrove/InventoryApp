@@ -1,8 +1,23 @@
 from tkinter import *
 import tkinter as tk
 from screeninfo import get_monitors
+import sqlite3
+from sqlite3 import Error
+
+
+def create_connection(path):
+    connection = None
+    try:
+        connection = sqlite3.connect('Wine Inventory.db')
+        print("Connection to SQLite DB successful")
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+    return connection
+
 
 FONT = ('Futura', 18, 'bold')
+
 
 app_width = 0
 app_height = 0
