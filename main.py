@@ -1,19 +1,19 @@
 from tkinter import *
 import tkinter as tk
 from screeninfo import get_monitors
-import sqlite3
-from sqlite3 import Error
-
-
-def create_connection(path):
-    connection = None
-    try:
-        connection = sqlite3.connect('Wine Inventory.db')
-        print("Connection to SQLite DB successful")
-    except Error as e:
-        print(f"The error '{e}' occurred")
-
-    return connection
+# import sqlite3
+# from sqlite3 import Error
+#
+#
+# def create_connection(path):
+#     connection = None
+#     try:
+#         connection = sqlite3.connect('Wine Inventory.db')
+#         print("Connection to SQLite DB successful")
+#     except Error as e:
+#         print(f"The error '{e}' occurred")
+#
+#     return connection
 
 
 FONT = ('Futura', 18, 'bold')
@@ -26,6 +26,14 @@ for m in get_monitors():
     if m.__getattribute__('is_primary'):
         app_width = (m.__getattribute__('width')) * .25
         app_height = (m.__getattribute__('height')) * .25
+
+
+def add_wine():
+    canvas.delete('all')
+    wine_search.destroy()
+    window.minsize(width=900, height=900)
+    fuck = Label(text='FUCK')
+
 
 # Window Config ------------------------------------------------------
 window = tk.Tk()
@@ -47,7 +55,7 @@ wine_search.config(background='MAROON')
 wine_search_entry = Entry(width=80)
 wine_search_entry.focus()
 wine_search_entry.grid(column=1, row=1, pady=2, padx=2)
-wine_search_button = Button(text='Search')
+wine_search_button = Button(text='Search', command=add_wine)
 wine_search_button.grid(column=2, row=1, pady=2, padx=2)
 
 # Wine Add Config -------------------------------------------------------
