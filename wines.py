@@ -6,3 +6,10 @@ class Wines:
         self.glass_price = glass_price
         self.bottle_price = bottle_price
 
+
+name = 'Shea'
+name_2 = 'Steven'
+name_3 = ''
+names = [name, name_2, name_3]
+if names == '':
+    print("nah")

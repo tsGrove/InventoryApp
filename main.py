@@ -57,42 +57,50 @@ def add_wine_screen():
     wine_bottle_entry.grid(column=1, row=5, padx=3, pady=3)
 
     def add_to_database():
+        wine_name = wine_add_bar.get()
+        wine_grape = wine_grape_entry.get()
+        wine_region = wine_region_entry.get()
+        wine_glass_price = int(wine_glass_entry.get())
+        wine_bottle_price = int(wine_bottle_entry.get())
+        wine_info = [wine_name, wine_grape, wine_region, wine_glass_price, wine_bottle_price]
+        if wine_info == '':
+                messagebox.showinfo(title='Hol up', message='Please make sure all fields are filled out'
+                                                                'and have something entered')
         try:
-            wine_name = wine_add_bar.get()
-            wine_grape = wine_grape_entry.get()
-            wine_region = wine_region_entry.get()
-            wine_glass_price = int(wine_glass_entry.get())
-            wine_bottle_price = int(wine_bottle_entry.get())
-            with connection:
-                cursor.execute("INSERT INTO wine VALUES (:name, :grape, :region, :glass_price, :bottle_price)",
-                               {
-                                   "name": wine_name, "grape": wine_grape, "region": wine_region,
-                                   "glass_price": wine_glass_price, "bottle_price": wine_bottle_price
-                               })
 
-            wine_add_name.destroy()
-            wine_add_bar.destroy()
-            wine_add_grape.destroy()
-            wine_grape_entry.destroy()
-            wine_add_region.destroy()
-            wine_region_entry.destroy()
-            wine_add_glass_price.destroy()
-            wine_glass_entry.destroy()
-            wine_add_bottle_price.destroy()
-            wine_bottle_entry.destroy()
-            addition_button.destroy()
+            else:
+                with connection:
+                    cursor.execute("INSERT INTO wine VALUES (:name, :grape, :region, :glass_price, :bottle_price)",
+                                   {
+                                       "name": wine_name, "grape": wine_grape, "region": wine_region,
+                                       "glass_price": wine_glass_price, "bottle_price": wine_bottle_price
+                                   })
+                    cursor.execute("SELECT * FROM wine WHERE name=:name", {'name': wine_name})
+                    result = cursor.fetchall()
+                    print(result)
+                    wine_add_name.destroy()
+                    wine_add_bar.destroy()
+                    wine_add_grape.destroy()
+                    wine_grape_entry.destroy()
+                    wine_add_region.destroy()
+                    wine_region_entry.destroy()
+                    wine_add_glass_price.destroy()
+                    wine_glass_entry.destroy()
+                    wine_add_bottle_price.destroy()
+                    wine_bottle_entry.destroy()
+                    addition_button.destroy()
 
-            home_wine_search_button = Button(text='Search', height=5, width=15, command=search_wine)
-            home_wine_search_button.grid(column=1, row=1, pady=2, padx=2)
-            home_wine_add_button = Button(text='Add', width=15, height=5, command=add_wine_screen)
-            home_wine_add_button.grid(column=0, row=1, pady=2)
-            home_wine_delete_button = Button(text='86', width=15, height=5)
-            home_wine_delete_button.grid(column=2, row=1, pady=2, padx=2)
-            window.minsize(width=750, height=400)
+                home_wine_search_button = Button(text='Search', height=5, width=15, command=search_wine)
+                home_wine_search_button.grid(column=1, row=1, pady=2, padx=2)
+                home_wine_add_button = Button(text='Add', width=15, height=5, command=add_wine_screen)
+                home_wine_add_button.grid(column=0, row=1, pady=2)
+                home_wine_delete_button = Button(text='86', width=15, height=5)
+                home_wine_delete_button.grid(column=2, row=1, pady=2, padx=2)
+                window.minsize(width=750, height=400)
 
-        except ValueError:
-            messagebox.showinfo(title='Error', message="Make sure you've entered a numerical value for the glass"
-                                                       " and bottle prices")
+            except ValueError:
+                messagebox.showinfo(title='Error', message="Make sure you've entered a numerical value for the glass"
+                                                           " and bottle prices")
 
     addition_button = Button(text="Add to Inventory!", command=add_to_database)
     addition_button.grid(column=1, row=6)
