@@ -19,7 +19,8 @@ cursor.execute("""CREATE TABLE wine (
 
 
 def add_wine_screen():
-    window.minsize(width=750, height=600)
+    window.minsize(width=750, height=625)
+    window.maxsize(width=750, height=625)
 
     wine_search_button.destroy()
     wine_add_button.destroy()
@@ -28,9 +29,9 @@ def add_wine_screen():
     wine_add_name = Label(text='Wine Name:', font=FONT, fg='WHITE')
     wine_add_name.grid(row=1, column=0, padx=3, pady=3)
     wine_add_name.config(background='MAROON')
-    wine_add_bar = Entry(width=80)
-    wine_add_bar.grid(column=1, row=1, pady=3, padx=3)
-    wine_add_bar.focus()
+    wine_name_entry = Entry(width=80)
+    wine_name_entry.grid(column=1, row=1, pady=3, padx=3)
+    wine_name_entry.focus()
 
     wine_add_grape = Label(text='Varietal:', font=FONT, fg='WHITE')
     wine_add_grape.grid(row=2, column=0, padx=3, pady=3)
@@ -57,55 +58,36 @@ def add_wine_screen():
     wine_bottle_entry.grid(column=1, row=5, padx=3, pady=3)
 
     def add_to_database():
-        wine_name = wine_add_bar.get()
-        wine_grape = wine_grape_entry.get()
-        wine_region = wine_region_entry.get()
-        wine_glass_price = int(wine_glass_entry.get())
-        wine_bottle_price = int(wine_bottle_entry.get())
-        wine_info = [wine_name, wine_grape, wine_region, wine_glass_price, wine_bottle_price]
-        if wine_info == '':
-                messagebox.showinfo(title='Hol up', message='Please make sure all fields are filled out'
-                                                                'and have something entered')
         try:
-
+            wine_name = wine_name_entry.get()
+            wine_grape = wine_grape_entry.get()
+            wine_region = wine_region_entry.get()
+            wine_glass_price = int(wine_glass_entry.get())
+            wine_bottle_price = int(wine_bottle_entry.get())
+            wine_info = (wine_name, wine_grape, wine_region, wine_glass_price, wine_bottle_price)
+            if '' in wine_info:
+                messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
             else:
                 with connection:
                     cursor.execute("INSERT INTO wine VALUES (:name, :grape, :region, :glass_price, :bottle_price)",
-                                   {
-                                       "name": wine_name, "grape": wine_grape, "region": wine_region,
-                                       "glass_price": wine_glass_price, "bottle_price": wine_bottle_price
-                                   })
-                    cursor.execute("SELECT * FROM wine WHERE name=:name", {'name': wine_name})
-                    result = cursor.fetchall()
-                    print(result)
-                    wine_add_name.destroy()
-                    wine_add_bar.destroy()
-                    wine_add_grape.destroy()
-                    wine_grape_entry.destroy()
-                    wine_add_region.destroy()
-                    wine_region_entry.destroy()
-                    wine_add_glass_price.destroy()
-                    wine_glass_entry.destroy()
-                    wine_add_bottle_price.destroy()
-                    wine_bottle_entry.destroy()
-                    addition_button.destroy()
+                                   { "name": wine_name, "grape": wine_grape, "region": wine_region,
+                                     "glass_price": wine_glass_price, "bottle_price": wine_bottle_price})
+                wine_name_entry.delete(0, END)
+                wine_grape_entry.delete(0, END)
+                wine_region_entry.delete(0, END)
+                wine_glass_entry.delete(0, END)
+                wine_bottle_entry.delete(0, END)
 
-                home_wine_search_button = Button(text='Search', height=5, width=15, command=search_wine)
-                home_wine_search_button.grid(column=1, row=1, pady=2, padx=2)
-                home_wine_add_button = Button(text='Add', width=15, height=5, command=add_wine_screen)
-                home_wine_add_button.grid(column=0, row=1, pady=2)
-                home_wine_delete_button = Button(text='86', width=15, height=5)
-                home_wine_delete_button.grid(column=2, row=1, pady=2, padx=2)
-                window.minsize(width=750, height=400)
-
-            except ValueError:
-                messagebox.showinfo(title='Error', message="Make sure you've entered a numerical value for the glass"
-                                                           " and bottle prices")
+        except ValueError:
+            messagebox.showinfo(title='Wait a second', message='Make sure you are entering numbers for the glass'
+                                                               ' and bottle prices!')
 
     addition_button = Button(text="Add to Inventory!", command=add_to_database)
     addition_button.grid(column=1, row=6)
     addition_button.config(height=3, width=40)
 
+    back_button = Button(text='Back to Home')
+    back_button.grid(column=0, row=6)
 
 def search_wine():
     window.minsize(width=800, height=400)
