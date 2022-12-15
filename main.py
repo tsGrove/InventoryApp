@@ -83,6 +83,7 @@ def add_wine_screen():
                 wine_vintage_add.delete(0, END)
                 wine_on_hand_entry.delete(0, END)
                 wine_bottle_entry.delete(0, END)
+                wine_name_entry.focus()
 
         except ValueError:
             messagebox.showinfo(title='Wait a second', message='Make sure you are entering numbers for the bottle '
@@ -183,18 +184,29 @@ def delete_wines_screen():
                 messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
             else:
                 with connection:
-                    answer = messagebox.askyesno(title='Confirmation', message=f"Are you sure you want to delete "
-                                                                               f"{wine_name}, Vintage: {wine_vintage}"
-                                                                               f" from the database?")
-                    if answer:
-                        cursor.execute("DELETE from wine WHERE name = :name AND vintage = :vintage",
-                                       {'name': wine_name, 'vintage': wine_vintage})
-                        messagebox.showinfo(title="Completed", message=f"{wine_name} has been successfully removed.")
+                    cursor.execute("SELECT * FROM wine WHERE name =:name AND vintage =:vintage", {
+                        'name': wine_name, 'vintage': wine_vintage})
+                    wine_search = cursor.fetchone()
+                    print(wine_search)
+                    if wine_search is not None:
+                        answer = messagebox.askyesno(title='Confirmation', message=f"Are you sure you want to delete "
+                                                                                   f"{wine_name}, Vintage: {wine_vintage}"
+                                                                                   f" from the database?")
+                        if answer:
+                            cursor.execute("DELETE from wine WHERE name = :name AND vintage = :vintage",
+                                           { 'name': wine_name, 'vintage': wine_vintage })
+                            messagebox.showinfo(title="Completed",
+                                                message=f"{wine_name} has been successfully removed.")
+                            wine_name_entry.delete(0, END)
+                            wine_vintage_add.delete(0, END)
+                            wine_name_entry.focus()
+                        else:
+                            print(answer)
+                            messagebox.showinfo(title='Wine Not Found', message='That wine doesn\'t appear to be in the'
+                                                                                'inventory, double check spelling.')
                     else:
-                        print(answer)
-                        messagebox.showinfo(title='', message='Okay')
-                wine_name_entry.delete(0, END)
-                wine_vintage_add.delete(0, END)
+                        messagebox.showerror(title="Hold up king", message='That wine doesn\'t appear to be in the '
+                                                                           'inventory, double check spelling.')
                 wine_name_entry.focus()
 
         except ValueError:
@@ -234,11 +246,11 @@ wine_delete_button.grid(column=2, row=1, pady=2, padx=2)
 
 
 def search(wine):
-    cursor.execute("SELECT * FROM wine WHERE name =:name", {'name': wine})
-    return cursor.fetchall()
+    cursor.execute("SELECT * FROM wine WHERE name =:name", { 'name': wine })
+    return cursor.fetchone()
 
 
-print(search('Shatter'))
+print(search('Matsu'))
 # print(window.winfo_children())
 
 window.mainloop()
