@@ -4,7 +4,6 @@ import tkinter as tk
 import sqlite3
 
 FONT = ('Futura', 18, 'normal')
-
 connection = sqlite3.connect('wine_db')
 cursor = connection.cursor()
 
@@ -78,6 +77,9 @@ def add_wine_screen():
                                        "name": wine_name, "grape": wine_grape, "on_hand": wine_on_hand,
                                        'vintage': wine_vintage, "bottle_price": wine_bottle_price
                                    })
+                    messagebox.showinfo(title='Successful', message=f'{wine_name} has successfully been added '
+                                                                    f'to the database!')
+
                 wine_name_entry.delete(0, END)
                 wine_grape_entry.delete(0, END)
                 wine_vintage_add.delete(0, END)
@@ -118,34 +120,35 @@ def search_wines_screen():
     wine_vintage_add = Entry(width=80)
     wine_vintage_add.grid(column=1, row=4, pady=3, padx=3)
 
-    # def search_wines():
-    #     try:
-    #         wine_name = wine_name_entry.get()
-    #         wine_grape = wine_grape_entry.get()
-    #         wine_region = wine_region_entry.get()
-    #         wine_glass_price = int(wine_glass_entry.get())
-    #         wine_bottle_price = int(wine_bottle_entry.get())
-    #         wine_info = (wine_name, wine_grape, wine_region, wine_glass_price, wine_bottle_price)
-    #         if '' in wine_info:
-    #             messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
-    #         else:
-    #             with connection:
-    #                 cursor.execute("INSERT INTO wine VALUES (:name, :grape, :region, :glass_price, :bottle_price)",
-    #                                {
-    #                                    "name": wine_name, "grape": wine_grape, "region": wine_region,
-    #                                    "glass_price": wine_glass_price, "bottle_price": wine_bottle_price
-    #                                })
-    #             wine_name_entry.delete(0, END)
-    #             wine_grape_entry.delete(0, END)
-    #             wine_region_entry.delete(0, END)
-    #             wine_glass_entry.delete(0, END)
-    #             wine_bottle_entry.delete(0, END)
-    #
-    #     except ValueError:
-    #         messagebox.showinfo(title='Wait a second', message='Make sure you are entering numbers for the glass'
-    #                                                            ' and bottle prices!')
+    def search_wines():
+        try:
+            wine_name = wine_name_entry.get().title()
+            wine_vintage = int(wine_vintage_add.get())
+            wine_info = (wine_name, wine_vintage)
+            if '' in wine_info:
+                messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
+            else:
+                with connection:
+                    cursor.execute("SELECT * FROM wine WHERE name =:name AND vintage =:vintage",
+                                   {
+                                       'name': wine_name,
+                                       'vintage': wine_vintage
+                                   })
+                    wine = cursor.fetchone()
+                    if wine is not None:
+                        messagebox.showinfo(title='Info', message=f"Name: {wine[0]}, Varietal: {wine[1]}, Vintage: {wine[2]},\n"
+                                                                  f"Bottles on Hand: {wine[3]}, Bottle Price: {wine[4]}")
+                        wine_name_entry.delete(0, END)
+                        wine_vintage_add.delete(0, END)
+                        wine_name_entry.focus()
+                    else:
+                        messagebox.showerror(title='Uh-oh', message="Sorry, looks like that wine isn't in the database!")
+                        wine_name_entry.focus()
+        except ValueError:
+            messagebox.showinfo(title='Wait a second', message='Make sure you are entering numbers for the glass'
+                                                               ' and bottle prices!')
 
-    search_for_wine_button = Button(text="Search Wines")
+    search_for_wine_button = Button(text="Search Wines", command=search_wines)
     search_for_wine_button.grid(column=1, row=6)
     search_for_wine_button.config(height=3, width=20, pady=5, padx=5)
 
@@ -185,9 +188,9 @@ def delete_wines_screen():
             else:
                 with connection:
                     cursor.execute("SELECT * FROM wine WHERE name =:name AND vintage =:vintage", {
-                        'name': wine_name, 'vintage': wine_vintage})
+                        'name': wine_name, 'vintage': wine_vintage
+                    })
                     wine_search = cursor.fetchone()
-                    print(wine_search)
                     if wine_search is not None:
                         answer = messagebox.askyesno(title='Confirmation', message=f"Are you sure you want to delete "
                                                                                    f"{wine_name}, Vintage: {wine_vintage}"
@@ -201,9 +204,7 @@ def delete_wines_screen():
                             wine_vintage_add.delete(0, END)
                             wine_name_entry.focus()
                         else:
-                            print(answer)
-                            messagebox.showinfo(title='Wine Not Found', message='That wine doesn\'t appear to be in the'
-                                                                                'inventory, double check spelling.')
+                            messagebox.showinfo(title='Okay', message='Alrighty then')
                     else:
                         messagebox.showerror(title="Hold up king", message='That wine doesn\'t appear to be in the '
                                                                            'inventory, double check spelling.')
@@ -247,10 +248,9 @@ wine_delete_button.grid(column=2, row=1, pady=2, padx=2)
 
 def search(wine):
     cursor.execute("SELECT * FROM wine WHERE name =:name", { 'name': wine })
-    return cursor.fetchone()
+    return cursor.fetchall()
 
 
-print(search('Matsu'))
-# print(window.winfo_children())
+search('Shatter')
 
 window.mainloop()
