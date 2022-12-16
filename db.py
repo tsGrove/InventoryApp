@@ -1,12 +1,12 @@
 import sqlite3
 
-connection = sqlite3.connect(':memory:')
+connection = sqlite3.connect('poop.db')
 cursor = connection.cursor()
-cursor.execute("""CREATE TABLE wine (
-                name text,
-                grape text,
-                glass_price integer
-                 )""")
+# cursor.execute("""CREATE TABLE wine (
+#                 name text,
+#                 grape text,
+#                 glass_price integer
+#                  )""")
 
 
 class Wines:
@@ -27,17 +27,19 @@ def search_wine(wine):
     return cursor.fetchall()
 
 
-def update_price(wine):
+def update_price(wine, glass_price):
     with connection:
         cursor.execute("""UPDATE wine SET glass_price = :glass_price
-                    WHERE name =: name""",
-                  {'name': wine.name, 'glass_price': wine.glass_price})
+                    WHERE name =: name AND grape =:grape""",
+                  {'name': wine.name, 'glass_price': glass_price})
 
 
 def remove_wine(wine):
     with connection:
         cursor.execute("DELETE from wine WHERE name = :name"
                        , {'name': wine.name})
+
+
 
 
 wine_1 = Wines('Shatter', 'Grenache', 13)
@@ -52,8 +54,14 @@ add_wine(wine_3)
 add_wine(wine_4)
 add_wine(wine_5)
 
+sqlite_select_query = """SELECT * from C:/Users/tshar/PycharmProjects/Inventory App/poop.db"""
+cursor.execute(sqlite_select_query)
+records = cursor.fetchall()
+print(records)
+
 shit = search_wine("Shatter")
 print(shit)
+
 
 connection.close()
 
