@@ -1,15 +1,18 @@
-import os.path
+# TODO Line 178, Lets figure out how to display then entire db in a new window
+# TODO After that sort out how to reopen the script or reset the windows upon clicking back button
+# TODO profit
+
 from tkinter import *
 from tkinter import messagebox
 import tkinter as tk
 import sqlite3
 
 FONT = ('Futura', 18, 'normal')
-connection = sqlite3.connect('wine')
+connection = sqlite3.connect('wine_database.db')
 cursor = connection.cursor()
 
-#
-# cursor.execute("""CREATE TABLE wine (
+
+# cursor.execute("""CREATE TABLE wine_database (
 #                 name text,
 #                 grape text,
 #                 vintage integer,
@@ -68,25 +71,29 @@ def add_wine_screen():
             wine_on_hand = int(wine_on_hand_entry.get())
             wine_bottle_price = int(wine_bottle_entry.get())
             wine_info = (wine_name, wine_grape, wine_bottle_price)
+
             if '' in wine_info:
                 messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
+
             else:
                 with connection:
-                    cursor.execute("SELECT * FROM wine WHERE name =:name AND vintage =:vintage",
+                    cursor.execute("SELECT * FROM wine_database WHERE name =:name AND vintage =:vintage",
                                    {
                                        'name': wine_name,
                                        'vintage': wine_vintage
                                    })
                     wine = cursor.fetchone()
-                    print(wine)
+
                     if wine is None:
-                        cursor.execute("INSERT INTO wine VALUES (:name, :grape, :vintage, :on_hand, :bottle_price)",
+                        cursor.execute("INSERT INTO wine_database VALUES (:name, :grape, :vintage,"
+                                       " :on_hand, :bottle_price)",
                                        {
                                            "name": wine_name, "grape": wine_grape, "on_hand": wine_on_hand,
                                            'vintage': wine_vintage, "bottle_price": wine_bottle_price
                                        })
                         messagebox.showinfo(title='Successful', message=f'{wine_name} has successfully been added '
                                                                         f'to the database!')
+
                     else:
                         messagebox.showerror(title="Uh-oh", message="It would appear that that wine is already "
                                                                     "in the database!")
@@ -141,42 +148,57 @@ def search_wines_screen():
             wine_name = wine_name_entry.get().title()
             wine_vintage = int(wine_vintage_add.get())
             wine_info = (wine_name, wine_vintage)
+
             if '' in wine_info:
                 messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
+
             else:
                 with connection:
-                    cursor.execute("SELECT * FROM wine WHERE name =:name AND vintage =:vintage",
+                    cursor.execute("SELECT * FROM wine_database WHERE name =:name AND vintage =:vintage",
                                    {
                                        'name': wine_name,
                                        'vintage': wine_vintage
                                    })
                     wine = cursor.fetchone()
-                    print(wine)
+
                     if wine is not None:
                         messagebox.showinfo(title='Info', message=f'Name: {wine[0]}, Varietal: {wine[1]}, '
                                                                   f'Vintage: {wine[2]},\n '
                                                                   f'Bottles on Hand: {wine[3]}, '
                                                                   f'Bottle Price: {wine[4]}')
-                        wine_name_entry.delete(0, END)
-                        wine_vintage_add.delete(0, END)
                         wine_name_entry.focus()
+
                     else:
                         messagebox.showerror(title='Uh-oh', message="Sorry, looks like that wine"
                                                                     " isn't in the database!")
                         wine_name_entry.focus()
+
         except ValueError:
             messagebox.showinfo(title='Wait a second', message='Make sure all the fields are filled out and you are'
                                                                ' entering numerical values for the vintage!')
 
     def search_every_wine():
-        base = os.path.dirname(os.path.abspath('main.py'))
-        print(base)
-        db_path = os.path.join(base, "PupilPremiumTable.db")
-        with sqlite3.connect(db_path) as _:
-            sqlite_select_query = f"""SELECT * from {db_path}"""
+        with connection:
+            sqlite_select_query = f"""SELECT * from wine_database"""
             cursor.execute(sqlite_select_query)
             records = cursor.fetchall()
-            print(records)
+
+            for row in records:
+                names_list = []
+                grapes_list = []
+                vintage_list = []
+                on_hand_list = []
+                bottle_price_list = []
+                name = ("Name: ", row[0])
+                grape = ("Grape: ", row[1])
+                vintage = ("Vintage: ", row[2])
+                on_hand = ("On Hand: ", row[3])
+                bottle_price = ("Bottle Price: ", row[4])
+                names_list.append(name)
+                grapes_list.append(grape)
+                vintage_list.append(vintage)
+                on_hand_list.append(on_hand)
+                bottle_price_list.append(bottle_price)
 
     def update_counts():
         try:
@@ -184,18 +206,21 @@ def search_wines_screen():
             wine_vintage = int(wine_vintage_add.get())
             wine_bottle_updated_count = int(wine_bottle_update_add.get())
             wine_info = (wine_name, wine_vintage, wine_bottle_updated_count)
+
             if '' in wine_info:
                 messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
+
             else:
                 with connection:
-                    cursor.execute("SELECT * FROM wine WHERE name =:name AND vintage =:vintage",
+                    cursor.execute("SELECT * FROM wine_database WHERE name =:name AND vintage =:vintage",
                                    {
                                        'name': wine_name,
                                        'vintage': wine_vintage
                                    })
                     wine = cursor.fetchone()
+
                     if wine is not None:
-                        cursor.execute("""UPDATE wine SET on_hand =:on_hand
+                        cursor.execute("""UPDATE wine_database SET on_hand =:on_hand
                                         WHERE name =:name AND vintage =:vintage""",
                                        {
                                            'name': wine_name, 'vintage': wine_vintage,
@@ -207,9 +232,11 @@ def search_wines_screen():
                         wine_vintage_add.delete(0, END)
                         wine_bottle_update_add.delete(0, END)
                         wine_name_entry.focus()
+
                     else:
                         messagebox.showerror(title="Hold up king", message="That wine doesn't appear to be in the "
                                                                            "inventory, double check spelling.")
+
         except ValueError:
             messagebox.showinfo(title='Wait a second', message='Make sure all the fields are filled out and you are'
                                                                ' entering numerical values for the vintage!')
@@ -256,11 +283,13 @@ def delete_wines_screen():
             wine_name = wine_name_entry.get().title()
             wine_vintage = int(wine_vintage_add.get())
             wine_info = (wine_name, wine_vintage)
+
             if '' in wine_info:
                 messagebox.showinfo(title='Wait a second', message='It would seem you left a field or two empty!')
+
             else:
                 with connection:
-                    cursor.execute("SELECT * FROM wine WHERE name =:name AND vintage =:vintage", {
+                    cursor.execute("SELECT * FROM wine_database WHERE name =:name AND vintage =:vintage", {
                         'name': wine_name, 'vintage': wine_vintage
                     })
                     wine_search = cursor.fetchone()
@@ -270,7 +299,7 @@ def delete_wines_screen():
                                                                                    f"Vintage: {wine_vintage}"
                                                                                    f" from the database?")
                         if answer:
-                            cursor.execute("DELETE from wine WHERE name = :name AND vintage = :vintage",
+                            cursor.execute("DELETE from wine_database WHERE name = :name AND vintage = :vintage",
                                            { 'name': wine_name, 'vintage': wine_vintage })
                             messagebox.showinfo(title="Completed",
                                                 message=f"{wine_name} has been successfully removed.")

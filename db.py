@@ -1,7 +1,7 @@
 import sqlite3
 
-connection = sqlite3.connect('poop.db')
-cursor = connection.cursor()
+# connection = sqlite3.connect('poop.db')
+# cursor = connection.cursor()
 # cursor.execute("""CREATE TABLE wine (
 #                 name text,
 #                 grape text,
