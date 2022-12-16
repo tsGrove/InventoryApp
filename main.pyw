@@ -1,6 +1,4 @@
-# TODO After that sort out how to reopen the script or reset the windows upon clicking back button
-# TODO profit
-
+import os
 from tkinter import *
 from tkinter import messagebox
 import tkinter as tk
@@ -10,17 +8,22 @@ FONT = ('Futura', 18, 'normal')
 connection = sqlite3.connect('wine_database.db')
 cursor = connection.cursor()
 
-# cursor.execute("""CREATE TABLE wine_database (
-#                 name text,
-#                 grape text,
-#                 vintage integer,
-#                 on_hand integer,
-#                 bottle_price integer
-#                  )""")
+try:
+    cursor.execute("""CREATE TABLE wine_database (
+                    name text,
+                    grape text,
+                    vintage integer,
+                    on_hand integer,
+                    bottle_price integer
+                     )""")
+
+except sqlite3.OperationalError:
+    print('Database exists, LGTM')
 
 
 def back_to_home():
     window.destroy()
+    os.startfile('main.pyw')
 
 
 def add_wine_screen():
@@ -189,7 +192,6 @@ def search_wines_screen():
             count = 0
 
             for row in records:
-
                 name = (row[0])
                 grape = (row[1])
                 vintage = (row[2])
@@ -203,9 +205,9 @@ def search_wines_screen():
 
                 count += 1
 
-        home_button = Button(new_window, text='Go Back', command=back_to_home)
-        home_button.grid(column=1, row=count)
-        home_button.config(height=3, width=10)
+        new_home_button = Button(new_window, text='Go Back', command=back_to_home)
+        new_home_button.grid(column=1, row=count)
+        new_home_button.config(height=3, width=10)
 
     def update_counts():
         try:
