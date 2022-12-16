@@ -1,4 +1,3 @@
-# TODO Line 178, Lets figure out how to display then entire db in a new window
 # TODO After that sort out how to reopen the script or reset the windows upon clicking back button
 # TODO profit
 
@@ -10,7 +9,6 @@ import sqlite3
 FONT = ('Futura', 18, 'normal')
 connection = sqlite3.connect('wine_database.db')
 cursor = connection.cursor()
-
 
 # cursor.execute("""CREATE TABLE wine_database (
 #                 name text,
@@ -67,7 +65,7 @@ def add_wine_screen():
         try:
             wine_name = wine_name_entry.get().title()
             wine_grape = wine_grape_entry.get().title()
-            wine_vintage = int(wine_vintage_add.get().title())
+            wine_vintage = int(wine_vintage_add.get())
             wine_on_hand = int(wine_on_hand_entry.get())
             wine_bottle_price = int(wine_bottle_entry.get())
             wine_info = (wine_name, wine_grape, wine_bottle_price)
@@ -179,26 +177,35 @@ def search_wines_screen():
 
     def search_every_wine():
         with connection:
-            sqlite_select_query = f"""SELECT * from wine_database"""
+            sqlite_select_query = """SELECT * from wine_database ORDER BY name ASC"""
             cursor.execute(sqlite_select_query)
             records = cursor.fetchall()
 
+            new_window = Toplevel(window)
+            new_window.title('All Wines')
+            new_window.minsize(600, 600)
+            new_window.config(bg='MAROON')
+
+            count = 0
+
             for row in records:
-                names_list = []
-                grapes_list = []
-                vintage_list = []
-                on_hand_list = []
-                bottle_price_list = []
-                name = ("Name: ", row[0])
-                grape = ("Grape: ", row[1])
-                vintage = ("Vintage: ", row[2])
-                on_hand = ("On Hand: ", row[3])
-                bottle_price = ("Bottle Price: ", row[4])
-                names_list.append(name)
-                grapes_list.append(grape)
-                vintage_list.append(vintage)
-                on_hand_list.append(on_hand)
-                bottle_price_list.append(bottle_price)
+
+                name = (row[0])
+                grape = (row[1])
+                vintage = (row[2])
+                on_hand = (row[3])
+                bottle_price = (row[4])
+
+                all_wines_label = Label(new_window, text=f"Name: {name}, Grape: {grape}, Vintage: {vintage}, "
+                                                         f"On Hand: {on_hand}, Bottle Price: {bottle_price}")
+                all_wines_label.config(font=FONT, fg='WHITE', bg='MAROON')
+                all_wines_label.grid(column=1, row=count)
+
+                count += 1
+
+        home_button = Button(new_window, text='Go Back', command=back_to_home)
+        home_button.grid(column=1, row=count)
+        home_button.config(height=3, width=10)
 
     def update_counts():
         try:
@@ -300,7 +307,7 @@ def delete_wines_screen():
                                                                                    f" from the database?")
                         if answer:
                             cursor.execute("DELETE from wine_database WHERE name = :name AND vintage = :vintage",
-                                           { 'name': wine_name, 'vintage': wine_vintage })
+                                           {'name': wine_name, 'vintage': wine_vintage})
                             messagebox.showinfo(title="Completed",
                                                 message=f"{wine_name} has been successfully removed.")
                             wine_name_entry.delete(0, END)
