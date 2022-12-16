@@ -337,7 +337,7 @@ def delete_wines_screen():
 # Window Config ------------------------------------------------------
 window = tk.Tk()
 window.title('Wine Inventory')
-window.minsize(width=750, height=400)
+window.minsize(width=750, height=450)
 window.config(padx=10, pady=10, bg='MAROON')
 
 # Logo Config ---------------------------------------------------------
