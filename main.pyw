@@ -307,6 +307,10 @@ def delete_wines_screen():
     wine_vintage_add = Entry(width=80)
     wine_vintage_add.grid(column=1, row=4, pady=3, padx=3)
 
+# remove_from_database takes the input provided by the user, searches through the database for the wine, if it exists
+# the user is prompted with a message to double-check that they're okay with removing it, and if so it is done. however
+# if the wine does not exist they are prompted with a different message to possibly check spelling, and to make sure
+# all fields are properly filled out
     def remove_from_database():
         try:
             wine_name = wine_name_entry.get().title()
