@@ -18,14 +18,18 @@ try:
                      )""")
 
 except sqlite3.OperationalError:
-    print('Database exists, LGTM')
+    print('Database exists')
 
 
+# back_to_home closes the window and reopens the main.pyw program, as a way to reset the window once the user is
+# done with the current screen they're on.
 def back_to_home():
     window.destroy()
     os.startfile('main.pyw')
 
 
+# add_wine_screen will destroy the 3 main buttons found on the main screen, adding fields for the user to fill out that
+# are required for the user to add new items to the database
 def add_wine_screen():
     window.minsize(width=750, height=625)
 
@@ -64,6 +68,9 @@ def add_wine_screen():
     wine_bottle_entry = Entry(width=80)
     wine_bottle_entry.grid(column=1, row=5, padx=3, pady=3)
 
+# add_to_database gathers all the inputs the user provided and will check a few things, first being that all the fields
+# are properly filled out, next it checks that the wine entered doesn't already exist inside the database by searching
+# for it, and if both those conditionals are met then they are prompted that the addition was successful
     def add_to_database():
         try:
             wine_name = wine_name_entry.get().title()
@@ -118,6 +125,9 @@ def add_wine_screen():
     back_button.grid(column=0, row=0)
 
 
+# search_wines_screen adjusts the window so that 3 new fields are presented, allowing the user to search for an item
+# in the database based on the name and varietal parameters, there is also an option to update the current value for
+# on_hand and an option for a new window to open that shows every item currently in the database
 def search_wines_screen():
     window.minsize(width=750, height=425)
 
@@ -144,6 +154,9 @@ def search_wines_screen():
     wine_bottle_update_add = Entry(width=80)
     wine_bottle_update_add.grid(column=1, row=3, pady=3, padx=3)
 
+# search_wines takes the user input gathered from the fields in the current screen and does a query through the
+# database before presenting the user with information about their query, first making sure the fields are properly
+# filled out and then that the wine exists in the database
     def search_wines():
         try:
             wine_name = wine_name_entry.get().title()
@@ -178,6 +191,8 @@ def search_wines_screen():
             messagebox.showinfo(title='Wait a second', message='Make sure all the fields are filled out and you are'
                                                                ' entering numerical values for the vintage!')
 
+# search_every_wine iterates through each row inside the database and places the information in a now window, and the
+# wines are presented as alphabetically descending
     def search_every_wine():
         with connection:
             sqlite_select_query = """SELECT * from wine_database ORDER BY name ASC"""
@@ -209,6 +224,8 @@ def search_wines_screen():
         new_home_button.grid(column=1, row=count)
         new_home_button.config(height=3, width=10)
 
+# this is the other button on the search_wines screen that will allow a user to update the current on_hand value of
+# the wine the user is searching for
     def update_counts():
         try:
             wine_name = wine_name_entry.get().title()
@@ -267,6 +284,9 @@ def search_wines_screen():
     update_count_button.config(height=3, width=20, pady=5, padx=5)
 
 
+# delete_wines_screen adjusts the window so that the user is presented 2 fields to fill out, the database is searched
+# using parameters provided by the user, and if a match is found the user is prompted with a window asking to confirm
+# the removal of the wine from the database, and a confirmation message if it was succesful
 def delete_wines_screen():
     window.minsize(width=750, height=425)
 
